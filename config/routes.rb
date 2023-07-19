@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :notifications, only: [:show, :create]
-      resources :user_notifications, only: [:show, :create]
+      resources :user_notifications, only: [:index, :show, :create]
     end
   end
 end

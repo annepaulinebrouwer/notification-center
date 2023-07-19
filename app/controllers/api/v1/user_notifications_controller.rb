@@ -1,8 +1,14 @@
 class Api::V1::UserNotificationsController < Api::V1::BaseController
-  acts_as_token_authentication_handler_for User, only: [ :create]
+  acts_as_token_authentication_handler_for User, only: [:index, :create]
   before_action :set_user_notifications, only: [:show]
   before_action :set_notification, only: [:create]
   before_action :set_user, only: [:create]
+
+  def index
+    # @user_notifications = current_user.user_notifications.not_seen
+    @user_notifications = current_user.user_notifications
+    @user_notifications.update_all(seen: true)
+  end
 
   def show
   end
@@ -24,7 +30,7 @@ class Api::V1::UserNotificationsController < Api::V1::BaseController
       render_error
     end
   rescue StandardError => e
-    Rails.logger.error "Error when creating UserNotification with notification_id: #{@notification.id} and user_id: #{@user.id}"
+    Rails.logger.error "Error when creating UserNotification with notification_id: #{@notification&.id} and user_id: #{@user&.id}"
     Rails.logger.error(e.message)
     render json: { error: e.message }, status: :internal_server_error
   end
