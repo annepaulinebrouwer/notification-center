@@ -6,11 +6,11 @@ class Api::V1::NotificationsController < ApplicationController
   end
 
   def create
-    return render json: { status: :unauthorized } unless current_user.admin?
+   return render json: { status: :unauthorized } unless current_user.admin?
 
     @notification = Notification.new(notification_params)
     if @notification.save
-      render :show
+      render :show, status: :created
     else
       render_error
     end

@@ -1,0 +1,52 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/notifications":
+    post:
+      summary: Creates a notification
+      tags:
+      - Notifications
+      parameters: []
+      responses:
+        '201':
+          description: notification created
+        '422':
+          description: invalid request - date in past
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                date:
+                  type: string
+              required:
+              - title
+              - description
+              - date
+          application/xml:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                date:
+                  type: string
+              required:
+              - title
+              - description
+              - date
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
