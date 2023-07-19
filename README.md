@@ -27,11 +27,11 @@
     ## Set up
     The notification center only works on a local machine
     To test the API please clone the repo and run the following commands
-    bunle install
+    bundle install
     rails db:create
     rails db:migrate
     rails db:seed
-    rails s
+    rails server
     
     
     ## Use API
