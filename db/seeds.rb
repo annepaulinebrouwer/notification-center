@@ -3,23 +3,41 @@
 #
 puts "Cleaning database..."
 User.destroy_all
+Notification.destroy_all
 
-puts "Creating admin user"
+puts "Creating admin user and two clients"
 User.create(
   email: "admin@inyova.com",
   password: "amazing_password",
   admin: true
 )
 
-puts "Creating two clients"
-User.create(
+paula = User.create(
   email: "paula@gmail.com",
   password: "testtest"
 )
 
-User.create(
+anne = User.create(
   email: "anne@gmail.com",
   password: "test1234"
 )
+
+puts "Creating two notifications"
+invest_today = Notification.create(
+  title: "Invest today",
+  description: "We added new sustainable companies to our portofolio. Check it out!",
+  date: Date.tomorrow.at_noon
+)
+
+birthday = Notification.create(
+  title: "Birthday Present",
+  description: "Happy Birtday! We have special discount for you.",
+  date: Date.today.advance(days: 2).noon
+)
+
+puts "Assigning notifications to users"
+invest_today.user_notifications.create(user_id: paula.id)
+invest_today.user_notifications.create(user_id: anne.id)
+birthday.user_notifications.create(user_id: paula.id)
 
 puts "Finished"
