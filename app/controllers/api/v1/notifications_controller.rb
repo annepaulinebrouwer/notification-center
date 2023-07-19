@@ -1,4 +1,4 @@
-class Api::V1::NotificationsController < ApplicationController
+class Api::V1::NotificationsController < Api::V1::BaseController
   before_action :set_notification, only: [:show]
   acts_as_token_authentication_handler_for User, only: [:create]
 
