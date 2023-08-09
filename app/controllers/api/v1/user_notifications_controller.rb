@@ -2,7 +2,6 @@ class Api::V1::UserNotificationsController < Api::V1::BaseController
   acts_as_token_authentication_handler_for User, only: %i[index create update]
   before_action :set_user_notifications, only: %i[show update]
   before_action :set_notification, only: [:create]
-  before_action :set_user, only: [:create]
 
   def index
     @user_notifications = current_user.user_notifications.not_seen
@@ -14,20 +13,23 @@ class Api::V1::UserNotificationsController < Api::V1::BaseController
   def create
     return render json: { status: :unauthorized } unless current_user.admin?
 
-    @user_notification = @user.user_notifications.build(notification_id: @notification.id)
-    mock_push_service(current_user) if Rails.env.development?
-
-    if @user_notification.save
-      render :show
-    else
-      render_unprocessable_error
+    errors = []
+    params[:user_ids].each do |user_id|
+      user = User.find(user_id)
+      @user_notification = user.user_notifications.build(notification_id: @notification.id)
+      mock_push_service(current_user) if Rails.env.development?
+      @user_notification.save
+    rescue ActiveRecord::RecordNotFound => e
+      errors << e
+      next
     end
+    errors.empty? ? :ok : users_not_found(errors)
   rescue StandardError => e
     render_standard_error(e)
   end
 
   def update
-    return unless params['seen'] == 'true'
+    return unless params[:seen] == 'true'
 
     @user_notification.update(seen: true)
   end
@@ -38,17 +40,13 @@ class Api::V1::UserNotificationsController < Api::V1::BaseController
     @user_notification = UserNotification.find(params[:id])
   end
 
-  def set_user
-    @user = User.find(params[:user_id])
-  end
-
   def set_notification
     @notification = Notification.find(params[:notification_id])
   end
 
-  def render_unprocessable_error
-    render json: { errors: @user_notifications.errors.full_messages },
-           status: :unprocessable_entity
+  def users_not_found(errors)
+    render json: { errors: },
+           status: :not_found
   end
 
   def render_standard_error(e)
